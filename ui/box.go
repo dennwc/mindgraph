@@ -19,6 +19,14 @@ type Box struct {
 	onMove []func(Pos)
 }
 
+func (b *Box) Selected(v bool) {
+	if v {
+		b.r.Fill("#00eeff55")
+	} else {
+		b.r.Fill("#0000ff33")
+	}
+}
+
 func (b *Box) Rect() dom.Rect {
 	if b.G == nil {
 		return dom.Rect{}
@@ -83,7 +91,7 @@ func (b *Box) NewNode(name string, pos Pos) *Object {
 			b.g.m.TrackMove(e, Drag(n))
 		}
 	})
-	b.g.RegisterNode(n)
+	b.g.Selectable(n)
 	n.MoveTo(pos)
 	return n
 }
@@ -96,6 +104,7 @@ func (b *Box) NewBox(name string, pos Pos) *Box {
 	b2 := b.newBox(name)
 	b2.attachSVG(b.cont)
 	b.subb = append(b.subb, b2)
+	b.g.Selectable(b2)
 	b2.MoveTo(pos)
 	return b2
 }
@@ -125,13 +134,14 @@ func (b *Box) attachSVG(parent *svg.Container) {
 
 	r := b.G.NewRect(w, h)
 	r.Stroke("#000")
-	r.Fill("#0000ff33")
 	r.SetRound(pad, pad)
 	b.r = r
 
 	t := b.G.NewText(b.name)
 	t.SetDPos(dom.Px(pad), dom.Em(1))
 	t.Selectable(false)
+
+	b.Selected(false)
 }
 func (b *Box) OnMove(fnc func(Pos)) {
 	b.onMove = append(b.onMove, fnc)

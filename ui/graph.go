@@ -23,7 +23,7 @@ type Graph struct {
 	slink, snode *svg.Container
 	m            *MouseArea
 	root         *Box
-	sel          *Object
+	sel          Selectable
 	links        []*Arrow
 }
 
@@ -37,30 +37,6 @@ func (g *Graph) Link(n1, n2 Linkable) *Arrow {
 	a := NewArrow(g.slink, n1, n2)
 	g.links = append(g.links, a)
 	return a
-}
-func (g *Graph) Deselect() {
-	if g.sel != nil {
-		g.sel.Selected(false)
-	}
-	g.sel = nil
-}
-func (g *Graph) Select(n *Object) {
-	g.Deselect()
-	if n != nil {
-		n.Selected(true)
-	}
-	g.sel = n
-}
-func (g *Graph) RegisterNode(n *Object) {
-	n.OnClick(func(_ *dom.MouseEvent) {
-		g.Select(n)
-	})
-	n.OnMouseDown(func(e *dom.MouseEvent) {
-		if e.Button() != dom.MouseLeft {
-			return
-		}
-		g.Select(n)
-	})
 }
 func (g *Graph) NewNode(name string, pos Pos) *Object {
 	return g.root.NewNode(name, pos)
