@@ -23,8 +23,3 @@ type Resizable interface {
 	Positioner
 	Resize(sz Size)
 }
-
-type Linkable interface {
-	Positioner
-	OnMove(fnc func(Pos))
-}
