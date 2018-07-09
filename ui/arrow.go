@@ -5,6 +5,7 @@ import "github.com/dennwc/dom/svg"
 type Linkable interface {
 	Positioner
 	OnMove(fnc func(Pos))
+	//OnResize(fnc func(Size))
 }
 
 func NewArrow(cont *svg.Container, src, dst Linkable) *Arrow {

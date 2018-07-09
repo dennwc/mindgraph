@@ -14,7 +14,7 @@ func (g *Graph) Deselect() {
 	g.sel = nil
 }
 
-func (g *Graph) Select(n Selectable) {
+func (g *Graph) Select(n *Box) {
 	g.Deselect()
 	if n != nil {
 		n.Selected(true)
@@ -22,7 +22,7 @@ func (g *Graph) Select(n Selectable) {
 	g.sel = n
 }
 
-func (g *Graph) Selectable(n Selectable) {
+func (g *Graph) Selectable(n *Box) {
 	n.OnClick(func(e *dom.MouseEvent) {
 		if e.Button() != dom.MouseLeft {
 			return

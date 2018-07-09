@@ -23,12 +23,15 @@ type Graph struct {
 	slink, snode *svg.Container
 	m            *MouseArea
 	root         *Box
-	sel          Selectable
+	sel          *Box
 	links        []*Arrow
 }
 
 func (g *Graph) Root() *Box {
 	return g.root
+}
+func (g *Graph) Selected() *Box {
+	return g.sel
 }
 func (g *Graph) Links() []*Arrow {
 	return append([]*Arrow{}, g.links...)
@@ -37,9 +40,6 @@ func (g *Graph) Link(n1, n2 Linkable) *Arrow {
 	a := NewArrow(g.slink, n1, n2)
 	g.links = append(g.links, a)
 	return a
-}
-func (g *Graph) NewNode(name string, pos Pos) *Object {
-	return g.root.NewNode(name, pos)
 }
 
 func (g *Graph) newBox(parent *Box, cont *svg.Container, name string) *Box {
