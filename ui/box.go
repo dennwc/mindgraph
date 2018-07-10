@@ -23,7 +23,8 @@ type Box struct {
 	r *svg.Rect
 	t *svg.Text
 
-	onMove []func(Pos)
+	onMove   []func(Pos)
+	onResize []func(Size)
 }
 
 func (b *Box) IsSubgraph() bool {
@@ -58,11 +59,16 @@ func (b *Box) updateRect() {
 
 func (b *Box) updateSize() {
 	sz := b.size
-	b.r.SetSize(sz.X, sz.Y)
-	if b.IsSubgraph() {
-		b.t.Translate(0, 0)
-	} else {
-		b.t.Translate(0, float64(sz.Y)/2)
+	if b.attached() {
+		b.r.SetSize(sz.X, sz.Y)
+		if b.IsSubgraph() {
+			b.t.Translate(0, 0)
+		} else {
+			b.t.Translate(0, float64(sz.Y)/2)
+		}
+	}
+	for _, fnc := range b.onResize {
+		fnc(sz)
 	}
 }
 
@@ -163,6 +169,34 @@ func (b *Box) NewBox(name string, pos Pos) *Box {
 
 	b.g.Selectable(b2)
 	b.sub = append(b.sub, b2)
+
+	parResize := func(sz Size) {
+		psz := b.size
+		resize := false
+		if sz.X > psz.X {
+			psz.X = sz.X
+			resize = true
+		}
+		if sz.Y > psz.Y {
+			psz.Y = sz.Y
+			resize = true
+		}
+		if resize {
+			b.Resize(psz)
+		}
+	}
+
+	b2.OnResize(func(sz Size) {
+		p, _ := b2.Position()
+		sz = sz.Add(p)
+		parResize(sz)
+	})
+	b2.onMove = append(b2.onMove, func(_ Pos) {
+		p, _ := b2.Position()
+		sz := b2.size.Add(p)
+		parResize(sz)
+	})
+
 	if toBox {
 		b.size = Size{300, 200}
 		b.Update()
@@ -205,4 +239,7 @@ func (b *Box) OnMove(fnc func(Pos)) {
 	if b.parent != nil {
 		b.parent.OnMove(fnc)
 	}
+}
+func (b *Box) OnResize(fnc func(Size)) {
+	b.onResize = append(b.onResize, fnc)
 }
